@@ -1857,6 +1857,117 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
     <meta name="savepage-state" content="Standard Items; Retain cross-origin frames; Merge CSS images; Remove unsaved URLs; Load lazy images in existing content; Max frame depth = 5; Max resource size = 50MB; Max resource time = 10s;">
     <meta name="savepage-version" content="33.9">
     <meta name="savepage-comments" content="">
+
+    <script>
+  const IFRAME_HOST_URL = "https://demo.ironcladapp.com";
+  const WORKFLOW_TEMPLATE_ID = "69658101baba0e5a4952f8d4";
+  const REDIRECT_URL = "https://www.doordash.com";
+
+  let CLICKWRAP_ACCEPTED = false;
+  function getFormValues() {
+    return {
+      counterpartyName: document.getElementById("companyName")?.value.trim() || "",
+      counterpartySignerName: document.getElementById("fullName")?.value.trim() || "",
+      counterpartySignerEmail: document.getElementById("email")?.value.trim() || ""
+    };
+  }
+  function allFormFieldsFilled(values) {
+    return values.counterpartyName &&
+           values.counterpartySignerName &&
+           values.counterpartySignerEmail;
+  }
+
+  function checkFormAndEnableButton() {
+    const formValues = getFormValues();
+    const button = document.getElementById("final-submit-button");
+
+    if (button) {
+      button.disabled = !(allFormFieldsFilled(formValues) && CLICKWRAP_ACCEPTED);
+    }
+  }
+  function sendEmptyDataToIframe() {
+    const iframe = document.getElementById("my-iframe");
+    if (!iframe?.contentWindow) return;
+
+    iframe.contentWindow.postMessage({
+      type: "set_data",
+      data: { formValues: {} }, 
+      workflowTemplateId: WORKFLOW_TEMPLATE_ID
+    }, IFRAME_HOST_URL);
+  }
+  function sendRealFormDataToIframe(values) {
+    const iframe = document.getElementById("my-iframe");
+    if (!iframe?.contentWindow) return;
+
+    iframe.contentWindow.postMessage({
+      type: "set_data",
+      data: { formValues: values }, 
+      workflowTemplateId: WORKFLOW_TEMPLATE_ID
+    }, IFRAME_HOST_URL);
+  }
+  function sendAcceptanceToIframe() {
+    const iframe = document.getElementById("my-iframe");
+    if (!iframe?.contentWindow) return;
+
+    iframe.contentWindow.postMessage({
+      type: "send_acceptance",
+      workflowTemplateId: WORKFLOW_TEMPLATE_ID
+    }, IFRAME_HOST_URL);
+  }
+
+  function handleIframeMessage(event) {
+    if (event.origin !== IFRAME_HOST_URL) return;
+
+    const type = event?.data?.type;
+    switch (type) {
+      case "clickwrap_initialized":
+        console.log("Clickwrap initialized");
+        sendEmptyDataToIframe(); 
+        break;
+      case "clickwrap_checkbox_checked":
+        console.log("Checkbox checked");
+        CLICKWRAP_ACCEPTED = true;
+        checkFormAndEnableButton();
+        break;
+      case "clickwrap_checkbox_unchecked":
+        console.log("Checkbox unchecked");
+        CLICKWRAP_ACCEPTED = false;
+        checkFormAndEnableButton();
+        break;
+      default:
+        console.log("Received message from iframe:", type);
+        break;
+    }
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    // 🔁 Start listening for iframe messages
+    window.addEventListener("message", handleIframeMessage);
+
+    ["companyName", "fullName", "email"].forEach(id => {
+      const input = document.getElementById(id);
+      if (input) input.addEventListener("input", checkFormAndEnableButton);
+    });
+    const button = document.getElementById("final-submit-button");
+    if (button) {
+      button.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const values = getFormValues();
+
+        if (!allFormFieldsFilled(values) || !CLICKWRAP_ACCEPTED) {
+          console.warn("Form not ready for submission.");
+          return;
+        }
+        sendRealFormDataToIframe(values);
+        sendAcceptanceToIframe();
+        setTimeout(() => {
+          window.location.href = REDIRECT_URL;
+        }, 500);
+      });
+    }
+  });
+</script>
+
 </head>
 
 <body class="js-focus-ring">
@@ -2023,7 +2134,16 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                         <div class="sc-aXZVg dTihRV">
                                                             <div class="InputRoot-sc-1urb1j5-0 fwJWvB">
                                                                 <div class="InputContainer-sc-1urb1j5-1 guNIGs">
-                                                                    <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="text" aria-label="Store name" placeholder="Store name" name="company" id="fieldWrapper-:r0:" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
+                                                                    <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="text" aria-label="Store name" placeholder="Store name" name="company" id="companyName" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="FieldRoot-sc-4yf1zh-0 fRqtlL">
+                                                        <div class="sc-aXZVg dTihRV">
+                                                            <div class="InputRoot-sc-1urb1j5-0 fwJWvB">
+                                                                <div class="InputContainer-sc-1urb1j5-1 guNIGs">
+                                                                    <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="text" aria-label="Full name" placeholder="Full name" name="fullName" id="fullName" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2049,7 +2169,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                             <div class="sc-aXZVg dTihRV">
                                                                 <div class="InputRoot-sc-1urb1j5-0 fwJWvB">
                                                                     <div class="InputContainer-sc-1urb1j5-1 guNIGs">
-                                                                        <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="email" aria-label="Email Address" autocomplete="on" placeholder="Email Address" name="" id="fieldWrapper-:r2:" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
+                                                                        <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="email" aria-label="Email Address" autocomplete="on" placeholder="Email Address" name="" id="email" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -2096,12 +2216,97 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                         <div><template data-savepage-shadowroot=""><iframe data-savepage-src="https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/f/ov2/av0/rch/j708h/0x4AAAAAABau05MxzDBhilmi/auto/fbE/new/normal?lang=auto" src="" allow="cross-origin-isolated; fullscreen; autoplay" sandbox="allow-same-origin allow-scripts allow-popups" id="cf-chl-widget-j708h" tabindex="-1" title="Widget containing a Cloudflare security challenge" aria-hidden="true" style="border: none; overflow: hidden; width: 0px; height: 0px; position: absolute; visibility: hidden;"></iframe></template><input type="hidden" name="cf-turnstile-response" id="cf-chl-widget-j708h_response" value="0.qZkOMB5Ds1JzIjY4AUisXLEDmV5EzSsacRVtHltW2IxbSAJXujRxAPLj7ufso-a5f53AHKbdjQaLqcP1F_Ti7gXpf4tWfwCuC8NvhQXCm2kidaAxBdsMZajILEtc-W5idUFuuCByKqW9hOEAxg0ZCU2IMX-Rd_UCNUCXIL9wyG7mHqXCaibWjyaWZWGFkZ_UDFRGAiYTUXNI_pLhvUd7wCGKeftorCQsbpOX77LVFc8qtu0Qs_TgIRmjwzw54QU_1-FHNADi7hipC83QI174brDXqXpDH_1d5LuEqn4IBO7HKVFbdOOdJSt0jpewfJmSaZqLcQDnFUlHS2QiwL5oBOC0G810mBMh71vlRqNLT_anG_ayzUkteCgkkb7w4HDQGmpgPGw88y0L_9yE-qaLKL5P_pnWNpO34RHOcSm2fK2EfyBdAf52qCZiqhRYHxVZCTPZF2KYgzba9KnE7Pk6Q0eaGoRF5-ioavwkegf8v1APRb-bTM9PigzmoR6NqFVtl9Roi-7VnQU9xw1YsU09H0dXOerwJkpd0onwu8BNtqIohEZObnbuudnwQpeLfYDiRPehybyf1hyaVSy6wbj7-xAjktt276YUVO-20w2Gd-81eKQWTW79R0130qjP3k7MSNjd8RX6VL7kNbR0lTlTDXhzge2SKOtCuxUafCkD6QPiNQjU8AkbuGqPA5oRLf427jCfmlJ2dCLXhcUnmhkMai4k1z4LI9Aa8BElX0cuCxfpwLr7LXbUXzQRIXvf0a6LZntjE6bB0G2-HdKZj44lqpQFB3fs0XenV3Ox9jTzfbOaszy3ckn7OLBI4PpAdHpxjxEj33tr375mmCsBd9eoADU0McVSwuMw3vwq8S0qYDOlbq54gm19q_XkHayajcO2ujeYK_gK8KAbdE1W79iZbcpd9qb1JRWyYW3JAHAtJJJo44S_u9el2sdyn2J78yzOeeFJCl_O9DqEoSbmLVt2Z620WgC1JxqT9SZw1-XGd_Q.1w3hb49_zHNO9bH_Cq9GMw.f06b88c1022b973036c0b315d3d82bdd5ef667baa868655e2ede64e816a4a899"></div>
                                                     </div>
                                                     <p class="sc-fPgHrj eOAJgf">By clicking "Submit," I agree to DoorDash's Consumer Terms and Conditions.</p>
+                                                    <div id="clickwrap-iframe-container">
+  <iframe
+    id="my-iframe"
+    src="https://demo.ironcladapp.com/clickwrap/69658101baba0e5a4952f8d4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmFtZUFuY2VzdG9ycyI6WyJodHRwczovL2xlY2ctY3cuZ2l0aHViLmlvIl0sImlhdCI6MTc2ODI2MDQ0MH0.Gm2sRKWurYc5Cr2Zb8tJCyXqeIQx49cSeCgcncOoGQU&parent=https://lecg-cw.github.io">
+  </iframe>
+</div>
+
                                                 </div>
                                                 <div class="sc-dUOoGL kzXvZk">
-                                                    <div class="nextbtn"><button kind="BUTTON/PRIMARY" class="sc-dcJsrY kURKns" data-component="mainHero.ssmoLead.singleStepForm" type="button"><span kind="BUTTON/PRIMARY" class="sc-fqkvVR mJpxy ContentWrapper-sc-n3xotb-1 eKNYZn"><span class="sc-gEvEer hVxarc LayoutContainer-sc-n3xotb-2 eIvTuC"><span class="MainContentContainer-sc-n3xotb-3 dJGHdz"><span class="sc-eqUAAy bTPaXU"><span class="sc-dtBdUo kaaEKg">Submit</span></span></span></span></span></button></div>
+                                                    <div class="nextbtn"><button id="final-submit-button" kind="BUTTON/PRIMARY" class="sc-dcJsrY kURKns" data-component="mainHero.ssmoLead.singleStepForm" type="button"><span kind="BUTTON/PRIMARY" class="sc-fqkvVR mJpxy ContentWrapper-sc-n3xotb-1 eKNYZn"><span class="sc-gEvEer hVxarc LayoutContainer-sc-n3xotb-2 eIvTuC"><span class="MainContentContainer-sc-n3xotb-3 dJGHdz"><span class="sc-eqUAAy bTPaXU"><span class="sc-dtBdUo kaaEKg">Submit</span></span></span></span></span></button></div>
                                                 </div>
                                             </div>
                                         </form>
+                                        <script>
+  function sendClickwrapFormData() {
+    const iframe = document.getElementById("my-iframe"); 
+    if (!iframe?.contentWindow) return;
+    const messageData = {
+      type: "set_data",
+      data: {
+        formValues: {
+          counterpartyName: formData.companyName,
+          counterpartySignerName: formData.fullName,
+          counterpartySignerEmail: formData.email
+        }
+      },
+      workflowTemplateId: WORKFLOW_TEMPLATE_ID
+    };
+
+    iframe.contentWindow.postMessage(messageData, IFRAME_HOST_URL);
+  }
+  function sendClickwrapAcceptance() {
+    const iframe = document.getElementById("my-iframe");
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage(
+        { type: "send_acceptance", workflowTemplateId: WORKFLOW_TEMPLATE_ID },
+        IFRAME_HOST_URL
+      );
+    }
+  }
+  function checkFormAndRenderIframe() {
+    // 🧠 These must match the input field IDs in your HTML
+    const companyName = document.getElementById("companyName").value.trim(); 
+    const fullName = document.getElementById("fullName").value.trim();       
+    const email = document.getElementById("email").value.trim();            
+
+    const allFilled = companyName && fullName && email;
+
+    if (allFilled && CLICKWRAP_ACCEPTED) {
+      formData = { companyName, fullName, email };
+      document.getElementById("final-submit-button").disabled = false; 
+    } else {
+      document.getElementById("final-submit-button").disabled = true;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    ['companyName', 'fullName', 'email'].forEach(id => {
+      document.getElementById(id).addEventListener('input', checkFormAndRenderIframe);
+    });
+
+    document.getElementById("final-submit-button").addEventListener("click", () => {
+      // ...collect the input values again
+      const companyName = document.getElementById("companyName").value.trim();
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      const iframeInPage = document.getElementById('my-iframe');
+
+      iframeInPage.contentWindow.postMessage({
+        type: "set_data",
+        data: {
+          formValues: {
+            counterpartyName: companyName,
+            counterpartySignerName: fullName,
+            counterpartySignerEmail: email
+          }
+        },
+        workflowTemplateId: WORKFLOW_TEMPLATE_ID
+      }, IFRAME_HOST_URL);
+
+      iframeInPage.contentWindow.postMessage({
+        type: "send_acceptance",
+        workflowTemplateId: WORKFLOW_TEMPLATE_ID
+      }, IFRAME_HOST_URL);
+
+      window.location.href = REDIRECT_URL;
+    });
+  });
+</script>
+
                                     </div>
                                 </div>
                                 <div class="sc-dBFDNq Qacq">
