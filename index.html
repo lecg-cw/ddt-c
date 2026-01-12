@@ -1868,12 +1868,16 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
     return {
       counterpartyName: document.getElementById("companyName")?.value.trim() || "",
       counterpartySignerName: document.getElementById("fullName")?.value.trim() || "",
-      counterpartySignerEmail: document.getElementById("email")?.value.trim() || ""
+      counterpartySignerEmail: document.getElementById("email")?.value.trim() || "",
+      storePhone: document.getElementById("storePhone")?.value.trim() || "",
+      businessType: document.getElementById("businessType")?.value.trim() || ""
     };
   }
   function allFormFieldsFilled(values) {
     return values.counterpartyName &&
            values.counterpartySignerName &&
+           values.storePhone &&
+           values.businessType &&
            values.counterpartySignerEmail;
   }
 
@@ -1940,7 +1944,6 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
     }
   }
   document.addEventListener("DOMContentLoaded", () => {
-    // 🔁 Start listening for iframe messages
     window.addEventListener("message", handleIframeMessage);
 
     ["companyName", "fullName", "email"].forEach(id => {
@@ -2148,7 +2151,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="sc-harTkY hZzBQx">
+                                                    <!-- <div class="sc-harTkY hZzBQx">
                                                         <div class="FieldRoot-sc-4yf1zh-0 fRqtlL">
                                                             <div class="sc-aXZVg dTihRV">
                                                                 <div class="InputRoot-sc-1urb1j5-0 fwJWvB">
@@ -2163,7 +2166,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="sc-gEvEer hohtMe">
                                                         <div class="FieldRoot-sc-4yf1zh-0 fRqtlL">
                                                             <div class="sc-aXZVg dTihRV">
@@ -2178,7 +2181,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                             <div class="sc-aXZVg dTihRV">
                                                                 <div class="InputRoot-sc-1urb1j5-0 fwJWvB">
                                                                     <div class="InputContainer-sc-1urb1j5-1 guNIGs">
-                                                                        <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="text" aria-label="Store phone" placeholder="Store phone" name="business_phone" id="fieldWrapper-:r3:" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
+                                                                        <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi"><input type="text" aria-label="Store phone" placeholder="Store phone" name="business_phone" id="storePhone" class="InputContent-sc-1urb1j5-4 dOFpua" value=""></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -2190,7 +2193,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                                 <div class="InputRoot-sc-1urb1j5-0 fwJWvB">
                                                                     <div class="InputContainer-sc-1urb1j5-1 guNIGs">
                                                                         <div data-prism-input-content-container="" class="InputContentContainer-sc-1urb1j5-2 cJhTMi">
-                                                                            <div class="SelectContainer-sc-1wqyx12-0 eNEMCi"><select id="fieldWrapper-:r4:" aria-label="Business Type" class="SelectElementContent-sc-1urb1j5-3 ecUSdl">
+                                                                            <div class="SelectContainer-sc-1wqyx12-0 eNEMCi"><select id="businessType" aria-label="Business Type" class="SelectElementContent-sc-1urb1j5-3 ecUSdl">
                                                                                     <option disabled="" value="">Select your business type</option>
                                                                                     <option value="Restaurant">Restaurant</option>
                                                                                     <option value="Grocery">Grocery (fresh produce, perishables, shelf stable products, dairy goods, pre-packaged meals)</option>
@@ -2239,7 +2242,10 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
         formValues: {
           counterpartyName: formData.companyName,
           counterpartySignerName: formData.fullName,
-          counterpartySignerEmail: formData.email
+          counterpartySignerEmail: formData.email,
+          storePhone: formData.storePhone,
+          businessType: formData.businessType
+
         }
       },
       workflowTemplateId: WORKFLOW_TEMPLATE_ID
@@ -2257,12 +2263,13 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
     }
   }
   function checkFormAndRenderIframe() {
-    // 🧠 These must match the input field IDs in your HTML
     const companyName = document.getElementById("companyName").value.trim(); 
     const fullName = document.getElementById("fullName").value.trim();       
-    const email = document.getElementById("email").value.trim();            
+    const email = document.getElementById("email").value.trim();
+    const email = document.getElementById("storePhone").value.trim();
+    const email = document.getElementById("businessType").value.trim();                
 
-    const allFilled = companyName && fullName && email;
+    const allFilled = companyName && fullName && email && storePhone && businessType;
 
     if (allFilled && CLICKWRAP_ACCEPTED) {
       formData = { companyName, fullName, email };
@@ -2282,6 +2289,8 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
       const companyName = document.getElementById("companyName").value.trim();
       const fullName = document.getElementById("fullName").value.trim();
       const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("storePhone").value.trim();
+      const email = document.getElementById("businessType").value.trim();   
 
       const iframeInPage = document.getElementById('my-iframe');
 
@@ -2291,7 +2300,9 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
           formValues: {
             counterpartyName: companyName,
             counterpartySignerName: fullName,
-            counterpartySignerEmail: email
+            counterpartySignerEmail: email,
+            storePhone: storePhone,
+            businessType: businessType
           }
         },
         workflowTemplateId: WORKFLOW_TEMPLATE_ID
