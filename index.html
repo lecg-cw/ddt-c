@@ -1946,7 +1946,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
   document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("message", handleIframeMessage);
 
-    ["companyName", "fullName", "email"].forEach(id => {
+    ["companyName", "fullName", "email", "storePhone", "businessType"].forEach(id => {
       const input = document.getElementById(id);
       if (input) input.addEventListener("input", checkFormAndEnableButton);
     });
