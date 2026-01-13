@@ -2347,28 +2347,6 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
     });
   });
 </script> -->
-There are a few issues with your code:
-
-**1. Duplicate variable declarations:**
-```javascript
-const email = document.getElementById("email").value.trim();
-const email = document.getElementById("storePhone").value.trim();  // Should be storePhone
-const email = document.getElementById("businessType").value.trim(); // Should be businessType
-```
-
-**2. Missing fields in the event listener array:**
-```javascript
-['companyName', 'fullName', 'email'].forEach(id => {  // Missing storePhone and businessType
-```
-
-**3. Missing fields in formData assignment:**
-```javascript
-formData = { companyName, fullName, email };  // Missing storePhone and businessType
-```
-
-Here's the corrected version:
-
-```javascript
 <script>
   function sendClickwrapFormData() {
     const iframe = document.getElementById("my-iframe"); 
