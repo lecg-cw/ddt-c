@@ -1889,16 +1889,58 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
       button.disabled = !(allFormFieldsFilled(formValues) && CLICKWRAP_ACCEPTED);
     }
   }
-  function sendEmptyDataToIframe() {
-    const iframe = document.getElementById("my-iframe");
-    if (!iframe?.contentWindow) return;
+  // function sendEmptyDataToIframe() {
+  //   const iframe = document.getElementById("my-iframe");
+  //   if (!iframe?.contentWindow) return;
 
-    iframe.contentWindow.postMessage({
-      type: "set_data",
-      data: { formValues: {} }, 
-      workflowTemplateId: WORKFLOW_TEMPLATE_ID
-    }, IFRAME_HOST_URL);
-  }
+  //   iframe.contentWindow.postMessage({
+  //     type: "set_data",
+  //     data: { formValues: {} }, 
+  //     workflowTemplateId: WORKFLOW_TEMPLATE_ID
+  //   }, IFRAME_HOST_URL);
+  // }
+
+  function sendEmptyDataToIframe() {
+  const iframe = document.getElementById("my-iframe");
+  if (!iframe?.contentWindow) return;
+  iframe.contentWindow.postMessage({
+    type: "set_data",
+    data: {
+      formValues: {},
+      styles: {
+        checkbox: {
+          uncheckedBorderColor: "#007490",
+          uncheckedBackgroundColor: "#F8F8F7",
+          checkedBackgroundColor: "#00A66F",
+          checkmarkColor: "lavender",
+        },
+        backgroundColor: "transparent",
+        acceptanceLanguageText: {
+          fontSize: "14px",
+          color: "#333333",
+          fontWeight: "400",
+          fontFamily: {
+            type: "common",
+            fontFamilyName: "Helvetica",
+          },
+          fontStyle: "normal",
+          textDecoration: undefined,
+        },
+        documentLink: {
+          color: "#0066CC",
+          fontWeight: "400",
+          fontFamily: {
+            type: "common",
+            fontFamilyName: "Helvetica",
+          },
+          fontStyle: "normal",
+          fontSize: "14px",
+        },
+      },
+    },
+    workflowTemplateId: WORKFLOW_TEMPLATE_ID
+  }, IFRAME_HOST_URL);
+}
   function sendRealFormDataToIframe(values) {
     const iframe = document.getElementById("my-iframe");
     if (!iframe?.contentWindow) return;
