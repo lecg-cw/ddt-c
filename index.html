@@ -2232,7 +2232,7 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
                                                 </div>
                                             </div>
                                         </form>
-                                        <script>
+                                     <!--    <script>
   function sendClickwrapFormData() {
     const iframe = document.getElementById("my-iframe"); 
     if (!iframe?.contentWindow) return;
@@ -2246,7 +2246,37 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
           storePhone: formData.storePhone,
           businessType: formData.businessType
 
-        }
+        },
+        styles: {
+  checkbox: {
+    uncheckedBorderColor: "#007490",
+    uncheckedBackgroundColor: "#F8F8F7",
+    checkedBackgroundColor: "#00A66F",
+    checkmarkColor: "lavender",
+  },
+  backgroundColor: "transparent",
+  acceptanceLanguageText: {
+    fontSize: "14px",
+    color: "#333333",
+    fontWeight: "400",
+    fontFamily: {
+      type: "common",
+      fontFamilyName: "Helvetica",
+    },
+    fontStyle: "normal",
+    textDecoration: undefined,
+  },
+  documentLink: {
+    color: "#0066CC",
+    fontWeight: "400",
+    fontFamily: {
+      type: "common",
+      fontFamilyName: "Helvetica",
+    },
+    fontStyle: "normal",
+    fontSize: "14px",
+  },
+},
       },
       workflowTemplateId: WORKFLOW_TEMPLATE_ID
     };
@@ -2316,7 +2346,141 @@ div[role="dialog"] h2, div[role="dialog"] h2 span { color: rgb(87, 0, 0); backgr
       window.location.href = REDIRECT_URL;
     });
   });
+</script> -->
+There are a few issues with your code:
+
+**1. Duplicate variable declarations:**
+```javascript
+const email = document.getElementById("email").value.trim();
+const email = document.getElementById("storePhone").value.trim();  // Should be storePhone
+const email = document.getElementById("businessType").value.trim(); // Should be businessType
+```
+
+**2. Missing fields in the event listener array:**
+```javascript
+['companyName', 'fullName', 'email'].forEach(id => {  // Missing storePhone and businessType
+```
+
+**3. Missing fields in formData assignment:**
+```javascript
+formData = { companyName, fullName, email };  // Missing storePhone and businessType
+```
+
+Here's the corrected version:
+
+```javascript
+<script>
+  function sendClickwrapFormData() {
+    const iframe = document.getElementById("my-iframe"); 
+    if (!iframe?.contentWindow) return;
+    const messageData = {
+      type: "set_data",
+      data: {
+        formValues: {
+          counterpartyName: formData.companyName,
+          counterpartySignerName: formData.fullName,
+          counterpartySignerEmail: formData.email,
+          storePhone: formData.storePhone,
+          businessType: formData.businessType
+        },
+        styles: {
+          checkbox: {
+            uncheckedBorderColor: "#007490",
+            uncheckedBackgroundColor: "#F8F8F7",
+            checkedBackgroundColor: "#00A66F",
+            checkmarkColor: "lavender",
+          },
+          backgroundColor: "transparent",
+          acceptanceLanguageText: {
+            fontSize: "14px",
+            color: "#333333",
+            fontWeight: "400",
+            fontFamily: {
+              type: "common",
+              fontFamilyName: "Helvetica",
+            },
+            fontStyle: "normal",
+            textDecoration: undefined,
+          },
+          documentLink: {
+            color: "#0066CC",
+            fontWeight: "400",
+            fontFamily: {
+              type: "common",
+              fontFamilyName: "Helvetica",
+            },
+            fontStyle: "normal",
+            fontSize: "14px",
+          },
+        },
+      },
+      workflowTemplateId: WORKFLOW_TEMPLATE_ID
+    };
+    iframe.contentWindow.postMessage(messageData, IFRAME_HOST_URL);
+  }
+
+  function sendClickwrapAcceptance() {
+    const iframe = document.getElementById("my-iframe");
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage(
+        { type: "send_acceptance", workflowTemplateId: WORKFLOW_TEMPLATE_ID },
+        IFRAME_HOST_URL
+      );
+    }
+  }
+
+  function checkFormAndRenderIframe() {
+    const companyName = document.getElementById("companyName").value.trim(); 
+    const fullName = document.getElementById("fullName").value.trim();       
+    const email = document.getElementById("email").value.trim();
+    const storePhone = document.getElementById("storePhone").value.trim();
+    const businessType = document.getElementById("businessType").value.trim();                
+    const allFilled = companyName && fullName && email && storePhone && businessType;
+    if (allFilled && CLICKWRAP_ACCEPTED) {
+      formData = { companyName, fullName, email, storePhone, businessType };
+      document.getElementById("final-submit-button").disabled = false; 
+    } else {
+      document.getElementById("final-submit-button").disabled = true;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    ['companyName', 'fullName', 'email', 'storePhone', 'businessType'].forEach(id => {
+      document.getElementById(id).addEventListener('input', checkFormAndRenderIframe);
+    });
+
+    document.getElementById("final-submit-button").addEventListener("click", () => {
+      const companyName = document.getElementById("companyName").value.trim();
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const storePhone = document.getElementById("storePhone").value.trim();
+      const businessType = document.getElementById("businessType").value.trim();   
+      
+      const iframeInPage = document.getElementById('my-iframe');
+      iframeInPage.contentWindow.postMessage({
+        type: "set_data",
+        data: {
+          formValues: {
+            counterpartyName: companyName,
+            counterpartySignerName: fullName,
+            counterpartySignerEmail: email,
+            storePhone: storePhone,
+            businessType: businessType
+          }
+        },
+        workflowTemplateId: WORKFLOW_TEMPLATE_ID
+      }, IFRAME_HOST_URL);
+
+      iframeInPage.contentWindow.postMessage({
+        type: "send_acceptance",
+        workflowTemplateId: WORKFLOW_TEMPLATE_ID
+      }, IFRAME_HOST_URL);
+
+      window.location.href = REDIRECT_URL;
+    });
+  });
 </script>
+```
 
                                     </div>
                                 </div>
